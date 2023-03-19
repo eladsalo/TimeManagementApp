@@ -1,4 +1,5 @@
 import math
+import tkinter
 from tkinter import *
 import csv
 import datetime
@@ -11,6 +12,9 @@ PINK = "#e2979c"
 RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
+DARK_GREEN = "#68b38a"
+PURPLE = "#a05eb5"
+BLUE = "#5e8eb5"
 FONT_NAME = "Courier"
 timer = None
 elapsed_time = 0
@@ -27,7 +31,7 @@ def stop_button():
 
     window.after_cancel(timer)
     curr_timer.config(text="00:00")
-    curr_title.config(text="Stopped", fg=GREEN)
+    curr_title.config(text="Stopped", fg=DARK_GREEN)
 
     total_minutes = total_time // 60
     total_seconds = total_time % 60
@@ -37,13 +41,13 @@ def stop_button():
 # ---------------------------- TIMER PAUSE ------------------------------- #
 def pause_button():
     global timer
-    curr_title.config(text="paused", fg=GREEN)
+    curr_title.config(text="Paused", fg=DARK_GREEN)
     window.after_cancel(timer)
 
 
 # ---------------------------- TIMER RUN ------------------------------- #
 def run_button():
-    curr_title.config(text="running", fg=GREEN)
+    curr_title.config(text="Running", fg=DARK_GREEN)
     global elapsed_time
     count(elapsed_time)  # pass total elapsed time as the starting value of counter
 
@@ -69,8 +73,30 @@ def count(counter):
     timer = window.after(1000, count, counter+1)
 
 
-# ---------------------------- SAVE TO CSV ------------------------------- #\
+# ---------------------------- SHOW DETAILS ------------------------------- #
+def show_details():
+    # Read the contents of the CSV file and format as a table
+    with open("time_records.csv", "r") as file:
+        csv_reader = csv.reader(file)
+        d = "date"
+        t = "learning time"
+        file_contents = f"{d:<15} {t:<15}\n"
+        for row in csv_reader:
+            if row[0] == "date":
+                continue
+            file_contents += f"{row[0]:<15} {row[1]:<15}\n"
 
+    popup = tkinter.Toplevel()
+    popup.title("Message")
+    popup.geometry("400x400")
+    popup.resizable(False, False)
+    popup_label = tkinter.Label(popup, font=(FONT_NAME, 15, "bold"), text=file_contents)
+    popup_label.pack(padx=10, pady=10)
+    ok_button = tkinter.Button(popup, text="OK", command=popup.destroy)
+    ok_button.pack(pady=10)
+
+
+# ---------------------------- SAVE TO CSV ------------------------------- #
 def save_to_csv():
     global total_time
     today = datetime.date.today()
@@ -108,87 +134,48 @@ def save_to_csv():
     total_timer.config(text="00:00")
 
 
-# def save_to_csv():
-#     global total_time
-#     today = datetime.date.today()
-#
-#     # Check if today's date already exists in the file
-#     existing_data = None
-#     with open('time_records.csv', mode='r') as csv_file:
-#         csv_reader = csv.reader(csv_file)
-#         for row in csv_reader:
-#             if row[0] == str(today):
-#                 existing_data = row
-#                 break
-#         csv_file.seek(0)
-#
-#     # If today's date already exists, update the time
-#     if existing_data:
-#         total_time += int(existing_data[1])
-#         with open('time_records.csv', mode='w', newline='') as csv_file:
-#             writer = csv.writer(csv_file)
-#             for row in csv.reader(open('time_records.csv', 'r')):
-#                 if row[0] == str(today):
-#                     writer.writerow([str(today), total_time])
-#                 else:
-#                     writer.writerow(row)
-#             csv_file.seek(0)
-#
-#     # If today's date doesn't exist, add a new row
-#     else:
-#         with open('time_records.csv', mode='a', newline='') as csv_file:
-#             writer = csv.writer(csv_file)
-#             writer.writerow([str(today), total_time])
-#
-#     total_time = 0
-#     total_timer.config(text="00:00")
-
-
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Time management ")
 window.config(padx=100, pady=50, bg=YELLOW)
-
+window.geometry("320x250+0+0")
 
 # ---------- TOTAL ----------------
 total_title = Label(text="Total", font=(FONT_NAME, 20, "bold"), bg=YELLOW)
-total_title.grid(row=0, column=0)
+total_title.place(x=-75, y=-20)
+
 
 total_timer = Label(text="00:00", font=(FONT_NAME, 20, "bold"), bg=YELLOW)
-total_timer.grid(row=1, column=0)
-
-
-# # ---------- JUST FOR GAPS ----------------
-# title_label_4 = Label(text="          ", font=(FONT_NAME, 20, "bold"), bg=YELLOW)
-# title_label_4.grid(row=0, column=1)
-#
-# title_label_5 = Label(text="          ", font=(FONT_NAME, 20, "bold"), bg=YELLOW)
-# title_label_5.grid(row=1, column=1)
-#
-# title_label_5 = Label(text="          ", font=(FONT_NAME, 20, "bold"), bg=YELLOW)
-# title_label_5.grid(row=1, column=1)
+total_timer.place(x=-75, y=10)
 
 
 # ---------- CURRENT TIMER ----------------
-curr_title = Label(text="Timer", font=(FONT_NAME, 25, "bold"), fg=GREEN, bg=YELLOW)
-curr_title.grid(row=0, column=3)
+curr_title = Label(text="Timer", font=(FONT_NAME, 30, "bold"), fg=DARK_GREEN, bg=YELLOW)
+curr_title.place(x=30, y=-40)
 
-curr_timer = Label(text="00:00", font=(FONT_NAME, 25, "bold"), fg=RED, bg=YELLOW)
-curr_timer.grid(row=1, column=3)
+
+curr_timer = Label(text="00:00", font=(FONT_NAME, 30, "bold"), fg=BLUE, bg=YELLOW)
+curr_timer.place(x=30, y=10)
 
 
 # ----------BUTTONS----------------
 run_button = Button(text="Start", font=(FONT_NAME, 16, "bold"), command=run_button, highlightthickness=0)
-run_button.grid(row=2, column=3)
+run_button.place(x=55, y=60)
+
 
 stop_button = Button(text="Stop", font=(FONT_NAME, 16, "bold"), command=stop_button, highlightthickness=0)
-stop_button.grid(row=3, column=3)
+stop_button.place(x=60, y=100)
+
 
 pause_button = Button(text="Pause", font=(FONT_NAME, 16, "bold"), command=pause_button, highlightthickness=0)
-pause_button.grid(row=4, column=3)
+pause_button.place(x=55, y=140)
 
-write_to_csv_button = Button(text="save to csv", font=(FONT_NAME, 16, "bold"), command=save_to_csv, highlightthickness=0)
-write_to_csv_button.grid(row=4, column=2)
+
+write_to_csv_button = Button(text="save", font=(FONT_NAME, 16, "bold"), command=save_to_csv, highlightthickness=0)
+write_to_csv_button.place(x=-75, y=140)
+
+show_details_button = Button(text="show\ndetails", font=(FONT_NAME, 16, "bold"), command=show_details, highlightthickness=0)
+show_details_button.place(x=-90, y=75)
 
 window.mainloop()
 
