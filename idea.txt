@@ -1,0 +1,4 @@
+
+ideas:
+* adding best week avarge
+* adding best day

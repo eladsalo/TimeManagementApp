@@ -1,4 +1,0 @@
-
-list of ideas:
-1. to add a button that enable to see the time_record
-

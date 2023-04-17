@@ -3,6 +3,7 @@ import tkinter
 from tkinter import *
 import csv
 import datetime
+import os
 
 import pandas
 
@@ -48,13 +49,13 @@ def pause_button():
 # ---------------------------- TIMER RUN ------------------------------- #
 def run_button():
     curr_title.config(text="Running", fg=DARK_GREEN)
-    global elapsed_time
-    count(elapsed_time)  # pass total elapsed time as the starting value of counter
+    count()  # pass total elapsed time as the starting value of counter
 
 
-def count(counter):
+def count():
     global timer
     global elapsed_time
+    counter = elapsed_time + 1
     minutes = math.floor(counter/60)
     seconds = counter % 60
     min_text = ""
@@ -70,10 +71,16 @@ def count(counter):
 
     elapsed_time = counter
     curr_timer.config(text=f"{min_text}:{seconds_text}")
-    timer = window.after(1000, count, counter+1)
+    timer = window.after(1000, count)
 
 
-# ---------------------------- SHOW DETAILS ------------------------------- #
+# ---------------------------- TAKE DOWN 2 MINUTES ------------------------------- #
+def take_down_2_minuets():
+    global elapsed_time
+    elapsed_time -= 120
+
+
+# ---------------------------- SHOW DETAILS- POPUP MASSAGE ------------------------------- #
 def show_details():
     # Read the contents of the CSV file and format as a table
     with open("time_records.csv", "r") as file:
@@ -88,12 +95,82 @@ def show_details():
 
     popup = tkinter.Toplevel()
     popup.title("Message")
-    popup.geometry("400x400")
+    popup.geometry("400x800")
     popup.resizable(False, False)
     popup_label = tkinter.Label(popup, font=(FONT_NAME, 15, "bold"), text=file_contents)
     popup_label.pack(padx=10, pady=10)
-    ok_button = tkinter.Button(popup, text="OK", command=popup.destroy)
-    ok_button.pack(pady=10)
+
+    def average_fun():
+        sum_time = 0
+        counter = 0
+        with open("time_records.csv", "r") as file:
+            csv_reader = csv.reader(file)
+            for row in csv_reader:
+                if row[0] == "date":
+                    continue
+                existing_time_str = row[1]
+                existing_hours, existing_minutes, existing_seconds = map(int, existing_time_str.split(":"))
+                existing_time = existing_hours * 3600 + existing_minutes * 60 + existing_seconds
+                sum_time += existing_time
+                counter += 1
+
+        # Convert new time to "HH:MM:SS" format
+        hours, rem = divmod(int(sum_time/counter), 3600)
+        minutes, seconds = divmod(rem, 60)
+        avg_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        avg_title.config(text=f"{avg_str}", fg=DARK_GREEN)
+
+    avg_button = Button(popup, text="average", font=(FONT_NAME, 16, "bold"), command=average_fun, highlightthickness=0)
+    avg_button.pack(padx=10, pady=10)
+    avg_title = Label(popup, text="", font=(FONT_NAME, 20, "bold"))
+    avg_title.pack(padx=10, pady=10)
+
+    def clear_info():
+        filename = "time_records.csv"
+        with open(filename, 'r+') as f:
+            f.readline()  # read one line
+            f.truncate(f.tell())  # terminate the file here. f.tell() returns the current position of the file pointer.
+            popup.destroy()
+            show_details()
+
+    clear_title = Button(popup, text="clear all", font=(FONT_NAME, 16, "bold"), command=clear_info, highlightthickness=0)
+    clear_title.pack(padx=10, pady=10)
+
+    def keep_last_7_days():
+        filename = "time_records.csv"
+        history_filename = "history.csv"
+
+        with open(filename, 'r+', newline='') as record_file, open(history_filename, 'a', newline='') as history_file:
+
+            reader = csv.reader(record_file)
+            # Skipping the header row
+            header = next(reader)
+            rows = list(reader)  # read all rows into a list
+
+            rows_to_keep = []
+            rows_to_move = []
+
+            for row in reversed(rows):
+                if len(rows_to_keep) <= 6:
+                    rows_to_keep.append(row)
+                else:
+                    rows_to_move.append(row)
+
+            with open("time_records2.csv", 'w', newline='') as updated_record:
+                writer = csv.writer(updated_record)
+                writer.writerow(header)
+                writer.writerows(reversed(rows_to_keep))
+
+            writer_history = csv.writer(history_file)
+            writer_history.writerows(reversed(rows_to_move))  # write rows to move to the history file
+
+        os.remove("time_records.csv")
+        os.rename("time_records2.csv", "time_records.csv")
+        popup.destroy()
+        show_details()
+
+    keep_7_days_button = Button(popup, text="keep last week", font=(FONT_NAME, 16, "bold"), command=keep_last_7_days, highlightthickness=0)
+    keep_7_days_button.pack(padx=10, pady=10)
 
 
 # ---------------------------- SAVE TO CSV ------------------------------- #
@@ -138,7 +215,7 @@ def save_to_csv():
 window = Tk()
 window.title("Time management ")
 window.config(padx=100, pady=50, bg=YELLOW)
-window.geometry("320x250+0+0")
+window.geometry("320x280+0+0")
 
 # ---------- TOTAL ----------------
 total_title = Label(text="Total", font=(FONT_NAME, 20, "bold"), bg=YELLOW)
@@ -170,12 +247,15 @@ stop_button.place(x=60, y=100)
 pause_button = Button(text="Pause", font=(FONT_NAME, 16, "bold"), command=pause_button, highlightthickness=0)
 pause_button.place(x=55, y=140)
 
+show_details_button = Button(text="show\ndetails", font=(FONT_NAME, 16, "bold"), command=show_details, highlightthickness=0)
+show_details_button.place(x=-90, y=75)
 
 write_to_csv_button = Button(text="save", font=(FONT_NAME, 16, "bold"), command=save_to_csv, highlightthickness=0)
 write_to_csv_button.place(x=-75, y=140)
 
-show_details_button = Button(text="show\ndetails", font=(FONT_NAME, 16, "bold"), command=show_details, highlightthickness=0)
-show_details_button.place(x=-90, y=75)
+take_down_button = Button(text="-2", font=(FONT_NAME, 16, "bold"), command=take_down_2_minuets, highlightthickness=0)
+take_down_button.place(x=70, y=180)
+
 
 window.mainloop()
 
