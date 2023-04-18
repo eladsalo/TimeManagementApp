@@ -154,9 +154,6 @@ class Functions:
         # clear_title = Button(popup, text="clear all", font=(FONT_NAME, 16, "bold"), command=clear_info, highlightthickness=0)
         # clear_title.pack(padx=10, pady=10)
 
-
-
-
     # ---------------------------- SAVE TO CSV ------------------------------- #
     def save_to_csv(self, total_timer):
         global total_time
