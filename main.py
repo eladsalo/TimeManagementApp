@@ -49,5 +49,12 @@ take_down_button = Button(text="-2", font=(FONT_NAME, 16, "bold"), command=fun.t
 take_down_button.place(x=70, y=180)
 
 
+# ------------ KEY PANELS------------ #
+window.bind('<space>', lambda event, curr_title = curr_title, curr_timer = curr_timer, window=window: fun.on_space_key(event, curr_title, curr_timer, window))
+
+window.bind('s', lambda event, total_timer = total_timer: fun.on_s_key(event, total_timer))
+
+window.bind('x', lambda event, window = window, curr_timer=curr_timer, curr_title=curr_title, total_timer=total_timer : fun.on_x_key(event, window, curr_timer, curr_title, total_timer))
+
 window.mainloop()
 

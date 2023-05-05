@@ -1,0 +1,13 @@
+
+
+# ------------ KEY PANELS------------ #
+'space' - like pressing 'start' button if program was 'Paused' or 'Stopped' 
+	like pressing 'pause' button if program was 'Running'.
+'s' - like pressing 'save' button.
+'x' - like pressing 'stop' button.
+
+
+
+Abilities:
+- If you missed a day its will add the missing day to the 'time_records' file. 
+it's will add a day automaticly with "00:00:00" if we skiped a day. 
