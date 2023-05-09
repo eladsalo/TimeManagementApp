@@ -7,6 +7,7 @@ import os
 import pandas
 from vars import timer, elapsed_time, total_time, DARK_GREEN, FONT_NAME
 from dateutil.parser import parse
+from tkinter import scrolledtext
 
 class Functions:
 
@@ -71,7 +72,6 @@ class Functions:
             t = "learning time"
             file_contents = f"{d:<15} {t:<15}\n"
             for row in csv_reader:
-                print(row)
                 if row[0] == "date":
                     continue
                 file_contents += f"{row[0]:<15} {row[1]:<15}\n"
@@ -191,8 +191,12 @@ class Functions:
             popup_history.title("History")
             popup_history.geometry("400x800")
             popup_history.resizable(False, False)
-            popup_history_label = tkinter.Label(popup_history, font=(FONT_NAME, 15, "bold"), text=file_contents)
-            popup_history_label.pack(padx=10, pady=10)
+            # popup_history_label = tkinter.Label(popup_history, font=(FONT_NAME, 15, "bold"), text=file_contents)
+            # popup_history_label.pack(padx=10, pady=10)
+
+            text_area = scrolledtext.ScrolledText(popup_history, width=80, height=150, font=(FONT_NAME, 15, "bold"))
+            text_area.insert(tkinter.END, file_contents)
+            text_area.pack()
 
         history_button = Button(popup, text="history", font=(FONT_NAME, 16, "bold"), command=display_history, highlightthickness=0)
         history_button.grid(row=4, column=0, padx=10, pady=10)
