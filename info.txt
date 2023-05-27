@@ -5,7 +5,7 @@
 	like pressing 'pause' button if program was 'Running'.
 's' - like pressing 'save' button.
 'x' - like pressing 'stop' button.
-
+'escape' -pressing 'escape' will minimizes the screen
 
 
 Abilities:

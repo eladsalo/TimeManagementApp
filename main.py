@@ -56,5 +56,8 @@ window.bind('s', lambda event, total_timer = total_timer: fun.on_s_key(event, to
 
 window.bind('x', lambda event, window = window, curr_timer=curr_timer, curr_title=curr_title, total_timer=total_timer : fun.on_x_key(event, window, curr_timer, curr_title, total_timer))
 
+window.bind('<Escape>', lambda event, window = window : fun.on_Escape_key(event, window))
+
+
 window.mainloop()
 

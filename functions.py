@@ -339,3 +339,6 @@ class Functions:
     def on_x_key(self, event, window, curr_timer, curr_title, total_timer):
         self.stop_button(window, curr_timer, curr_title, total_timer)
 
+    def on_Escape_key(self, event, window):
+        window.iconify()    # Minimize the screen
+
